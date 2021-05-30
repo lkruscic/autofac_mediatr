@@ -11,7 +11,7 @@ namespace autofac_mediatR
 {
     public interface IApplication
     {
-        void Run(IContainer c);
+        void Run(IContainer c, string key);
     }
 
     public class Application : IApplication
@@ -22,15 +22,21 @@ namespace autofac_mediatR
             Mediator = mediator;
         }
 
-        public void Run(IContainer c)
+        public void Run(IContainer c, string key)
         {
-            string key = "PingA";
-            var o = (PingA)c.ResolveKeyed<IRequest>(key);
-            o.StringTuple = new Tuple<string, string>("ping aaa1", "  ping aaa2");
+            var o = (IPing)c.ResolveKeyed<IRequest>(key);
+            o.StringTuple = new Tuple<string, string>($"item 1: {key}", $"item 2: {key}");
+            var defBColor = Console.BackgroundColor;
+            var defFColor = Console.ForegroundColor;
+
+            Console.BackgroundColor = ConsoleColor.Yellow;
+            Console.ForegroundColor = ConsoleColor.Red;
+
             Mediator.Send(o);
+
+            Console.BackgroundColor = defBColor;
+            Console.ForegroundColor = defFColor;
+
         }
-
-
-
     }
 }

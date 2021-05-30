@@ -32,10 +32,28 @@ namespace autofac_mediatR.IoC
             .As<IMediator>()
             .InstancePerLifetimeScope();
 
-            builder
-               .RegisterType(typeof(PingAHandler))
-               .As(typeof(RequestHandler<PingA>));
-            
+
+            var mediatrOpenTypes = new[]
+            {
+               typeof(IRequestHandler<,>),
+               typeof(IRequestExceptionHandler<,,>),
+               typeof(IRequestExceptionAction<,>),
+               typeof(INotificationHandler<>),
+               typeof(RequestHandler<>)
+            };
+
+            foreach (var mediatrOpenType in mediatrOpenTypes)
+            {
+                builder
+                .RegisterAssemblyTypes(typeof(IPing).GetTypeInfo().Assembly)
+                .AsClosedTypesOf(mediatrOpenType)
+                // when having a single class implementing several handler types
+                // this call will cause a handler to be called twice
+                // in general you should try to avoid having a class implementing for instance `IRequestHandler<,>` and `INotificationHandler<>`
+                // the other option would be to remove this call
+                // see also https://github.com/jbogard/MediatR/issues/462
+                .AsImplementedInterfaces();
+            }
 
             // request & notification handlers
             builder.Register<ServiceFactory>(context =>
@@ -43,55 +61,33 @@ namespace autofac_mediatR.IoC
                 var c = context.Resolve<IComponentContext>();
                 return t => c.Resolve(t);
             });
+            
 
             // builder.RegisterGeneric(typeof(LoggingBehavior<>)).As(typeof(IRequestPreProcessor<>));
             builder.RegisterGeneric(typeof(RequestPreProcessorBehavior<,>)).As(typeof(IPipelineBehavior<,>));
             // builder.RegisterGeneric(typeof(ExceptionHandler<,>)).As(typeof(IRequestExceptionHandler<,,>));
             builder.RegisterGeneric(typeof(RequestExceptionProcessorBehavior<,>)).As(typeof(IPipelineBehavior<,>));
 
-            // builder.Register(c => new PingAHandler().As<RequestHandler)
-
         }
 
         private static void RegisterPingRequests(ContainerBuilder builder)
         {
-            // builder.RegisterType<PingA>().Keyed<IPing>("PingA");
-            // builder.RegisterType<PingB>().Keyed<IRequest>("PingB");
-            // builder.RegisterType<PingC>().Keyed<IRequest>("PingC");
+            builder
+                .RegisterType<PingA>()
+                .As<IRequest>()
+                .Keyed<IRequest>("PingA");
 
             builder
-               .RegisterType<PingA>()
+               .RegisterType<PingB>()
                .As<IRequest>()
-               .Keyed<IRequest>("PingA");
-               //.WithParameter
-               //(
-               //   new TypedParameter(typeof(Tuple<string, string>), "t")
-               //);
+               .Keyed<IRequest>("PingB");
 
-
-
-            //.WithParameter(
-            //   new ResolvedParameter(
-            //      (pi, ctx) => pi.ParameterType == typeof(Tuple<string, string>),
-            //      (pi, ctx) => ctx.ResolveKeyed<Tuple<string, string>>("PingA"))
-            //   )
-            //.Keyed<IRequest>("PingA");
-
-            //builder.RegisterType<PingB>()
-            //.WithParameter(
-            //   new ResolvedParameter(
-            //      (pi, ctx) => pi.ParameterType == typeof(Tuple<string, string>),
-            //      (pi, ctx) => ctx.ResolveKeyed<IPing>("PingB")));            
-
-            //builder.RegisterType<PingC>()
-            //.WithParameter(
-            //   new ResolvedParameter(
-            //      (pi, ctx) => pi.ParameterType == typeof(Tuple<string, string>),
-            //      (pi, ctx) => ctx.ResolveKeyed<IPing>("PingC")));
+            builder
+               .RegisterType<PingC>()
+               .As<IRequest>()
+               .Keyed<IRequest>("PingC");
 
         }
 
-
-
-}
+    }
 }

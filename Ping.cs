@@ -10,35 +10,33 @@ using MediatR;
 namespace autofac_mediatR
 {
 
-
-    public class PingA : IRequest
+    public interface IPing
     {
-        public Tuple<string, string> StringTuple;
+        Tuple<string, string> StringTuple { get; set; }
+    }
+
+    public class PingA : IRequest, IPing
+    {
+        public Tuple<string, string> StringTuple { get; set; }
         public PingA()
         {
 
         }
-
-        //public PingA(Tuple<string, string> t)
-        //{
-        //    StringTuple = t;
-        //}
     }
 
     public class PingAHandler : RequestHandler<PingA>
     {
         protected override void Handle(PingA request)
-        {
-            Console.WriteLine($"PING A, item 1: {request.StringTuple.Item1} : {request.StringTuple.Item2}");
+        { 
+           Console.WriteLine($"PING A, item 1: {request.StringTuple.Item1} : {request.StringTuple.Item2}");
         }
     }
 
-    public class PingB : IRequest
+    public class PingB : IRequest, IPing
     {
-        public Tuple<string, string> StringTuple;
-        public PingB(Tuple<string, string> t)
+        public Tuple<string, string> StringTuple { get; set; }
+        public PingB()
         {
-            StringTuple = t;
         }
     }
 
@@ -50,12 +48,11 @@ namespace autofac_mediatR
         }
     }
 
-    public class PingC : IRequest
+    public class PingC : IRequest, IPing
     {
-        public Tuple<string, string> StringTuple;
-        public PingC(Tuple<string, string> t)
+        public Tuple<string, string> StringTuple { get; set; }
+        public PingC()
         {
-            StringTuple = t;
         }
     }
 
