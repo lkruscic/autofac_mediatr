@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Autofac;
@@ -61,7 +62,7 @@ namespace autofac_mediatR.IoC
                 var c = context.Resolve<IComponentContext>();
                 return t => c.Resolve(t);
             });
-            
+
 
             // builder.RegisterGeneric(typeof(LoggingBehavior<>)).As(typeof(IRequestPreProcessor<>));
             builder.RegisterGeneric(typeof(RequestPreProcessorBehavior<,>)).As(typeof(IPipelineBehavior<,>));
@@ -72,21 +73,29 @@ namespace autofac_mediatR.IoC
 
         private static void RegisterPingRequests(ContainerBuilder builder)
         {
-            builder
-                .RegisterType<PingA>()
-                .As<IRequest>()
-                .Keyed<IRequest>("PingA");
+           var asmbly = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName.StartsWith("autofac_mediatR")).FirstOrDefault();
+            asmbly.GetTypes().Where(t => typeof(IPing).IsAssignableFrom(t) && !t.IsInterface)
+            .ToList()
+            .ForEach(t =>
+            {
+                Console.WriteLine($"type ? {t.FullName}");
+                
+                dynamic x = Activator.CreateInstance(t);
+                CallPingBuilderWithInference(x, builder, t.Name);
 
-            builder
-               .RegisterType<PingB>()
-               .As<IRequest>()
-               .Keyed<IRequest>("PingB");
+            });
+        }
 
-            builder
-               .RegisterType<PingC>()
-               .As<IRequest>()
-               .Keyed<IRequest>("PingC");
+        private static void CallPingBuilderWithInference<PT>(PT p, ContainerBuilder cb, string name)
+        {
+           CallPingBuilder<PT>(cb, name);
+        }
 
+        private static void CallPingBuilder<PT>(ContainerBuilder cb, string name)
+        {
+            cb.RegisterType<PT>()
+            .As<IPing>()
+            .Keyed<IRequest>(name);
         }
 
     }

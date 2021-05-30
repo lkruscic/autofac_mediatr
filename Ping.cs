@@ -10,12 +10,12 @@ using MediatR;
 namespace autofac_mediatR
 {
 
-    public interface IPing
+    public interface IPing : IRequest
     {
         Tuple<string, string> StringTuple { get; set; }
     }
 
-    public class PingA : IRequest, IPing
+    public class PingA : IPing
     {
         public Tuple<string, string> StringTuple { get; set; }
         public PingA()
@@ -32,7 +32,7 @@ namespace autofac_mediatR
         }
     }
 
-    public class PingB : IRequest, IPing
+    public class PingB : IPing
     {
         public Tuple<string, string> StringTuple { get; set; }
         public PingB()
@@ -48,7 +48,7 @@ namespace autofac_mediatR
         }
     }
 
-    public class PingC : IRequest, IPing
+    public class PingC : IPing
     {
         public Tuple<string, string> StringTuple { get; set; }
         public PingC()
