@@ -12,12 +12,12 @@ namespace autofac_mediatR
 
     public interface IPing : IRequest
     {
-        Tuple<string, string> StringTuple { get; set; }
+        string Message { get; set; }
     }
 
     public class PingA : IPing
     {
-        public Tuple<string, string> StringTuple { get; set; }
+        public string Message { get; set; }
         public PingA()
         {
 
@@ -27,14 +27,14 @@ namespace autofac_mediatR
     public class PingAHandler : RequestHandler<PingA>
     {
         protected override void Handle(PingA request)
-        { 
-           Console.WriteLine($"PING A, item 1: {request.StringTuple.Item1} : {request.StringTuple.Item2}");
+        {
+            Console.WriteLine($"PING A request : {request.Message} handled by PingAHanlder! ");
         }
     }
 
     public class PingB : IPing
     {
-        public Tuple<string, string> StringTuple { get; set; }
+       public string Message { get; set; }
         public PingB()
         {
         }
@@ -44,13 +44,13 @@ namespace autofac_mediatR
     {
         protected override void Handle(PingB request)
         {
-            Console.WriteLine($"PING B, item 1: {request.StringTuple.Item1} : {request.StringTuple.Item2}");
+           Console.WriteLine($"PING B request : {request.Message} handled by PingBHanlder! ");
         }
     }
 
     public class PingC : IPing
     {
-        public Tuple<string, string> StringTuple { get; set; }
+       public string Message { get; set; }
         public PingC()
         {
         }
@@ -60,7 +60,7 @@ namespace autofac_mediatR
     {
         protected override void Handle(PingC request)
         {
-            Console.WriteLine($"PING C, item 1: {request.StringTuple.Item1} : {request.StringTuple.Item2}");
+           Console.WriteLine($"PING C request : {request.Message} handled by PingCHanlder! ");
         }
     }
 }

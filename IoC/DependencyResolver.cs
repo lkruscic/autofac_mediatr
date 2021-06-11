@@ -10,10 +10,11 @@ using Autofac.Core;
 
 namespace autofac_mediatR.IoC
 {
-    class DependencyResolver : IDependencyResolver
+    public class DependencyResolver : IDependencyResolver
     {
-        public static DependencyResolver Instance = new DependencyResolver();
         private IContainer _container;
+        public static DependencyResolver Instance = new DependencyResolver();
+
 
         public DependencyResolver()
         {
@@ -35,15 +36,23 @@ namespace autofac_mediatR.IoC
             return _container.ResolveKeyed<T>(key);
         }
 
+        public T ResolveNamed<T>(string name)
+        {
+            return _container.ResolveNamed<T>(name);
+        }
+
         private void BuildContainer()
         {
             var builder = new ContainerBuilder();
+            //builder.RegisterModule<AppServiceModule>();
 
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var appMOdules = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory)
+               .GetFiles()
+               .Where(x => x.Name.StartsWith("autofac_mediat") && (x.Name.EndsWith("exe") || x.Name.EndsWith("dll")))
+               .Select(dll => Assembly.LoadFile(dll.FullName)).ToArray();
 
-            builder.RegisterAssemblyModules(assemblies);
+            builder.RegisterAssemblyModules(appMOdules);
             builder.RegisterInstance(this).As<IDependencyResolver>().SingleInstance();
-
             _container = builder.Build();
         }
     }

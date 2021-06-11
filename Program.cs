@@ -1,29 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
+﻿using autofac_mediatR.IoC;
+using System;
 using System.Threading.Tasks;
-using Autofac;
-using autofac_mediatR.IoC;
-using MediatR;
 
 namespace autofac_mediatR
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            // create an autofac container builder
-            var containerBuilder = new ContainerBuilder();
-            containerBuilder.RegisterModule<AppServiceModule>();
-            var c = containerBuilder.Build();
-            var app = c.Resolve<IApplication>();
-
+            var app = DependencyResolver.Instance.Resolve<IMyApplication>();
+            PrintValidChoices();
             ConsoleKey response;
             do
             {
-                PrintValidChoices();
                 response = Console.ReadKey(false).Key;
                 Console.WriteLine("=---------------------------");
                 Console.WriteLine($"Selection: {response}");
@@ -31,17 +20,28 @@ namespace autofac_mediatR
                 switch (response)
                 {
                     case ConsoleKey.D1:
-                        app.Run(c, "PingA");
+                        app.RunPing("PingA");
                         break;
                     case ConsoleKey.D2:
-                        app.Run(c, "PingB");
+                        app.RunPing("PingB");
                         break;
                     case ConsoleKey.D3:
-                        app.Run(c, "PingC");
+                        app.RunPing("PingC");
+                        break;
+                    case ConsoleKey.D4:
+                        app.RunPong("PongA");
+                        break;                    
+                    case ConsoleKey.D5:
+                        app.RunPong("PongB");
+                        break;                    
+                    case ConsoleKey.D6:
+                        app.RunPong("PongC");
+                        break;
+                    case ConsoleKey.I:
+                        PrintValidChoices();
                         break;
                 }
-            } while (response != ConsoleKey.D4);
-
+            } while (response != ConsoleKey.D9);
         }
 
 
@@ -49,10 +49,14 @@ namespace autofac_mediatR
         {
             Console.WriteLine("");
             Console.WriteLine("==========================");
+            Console.WriteLine("i => 'Instruction'");
             Console.WriteLine("1 => 'PingA'");
             Console.WriteLine("2 => 'PingB'");
             Console.WriteLine("3 => 'PingC'");
-            Console.WriteLine("4 => 'Exit'");
+            Console.WriteLine("4 => 'PongA'");
+            Console.WriteLine("5 => 'PongB'");
+            Console.WriteLine("6 => 'PongC'");
+            Console.WriteLine("9 => 'Exit'");
             Console.WriteLine("Please make a selection!");
             Console.WriteLine("==========================");
             Console.WriteLine("");

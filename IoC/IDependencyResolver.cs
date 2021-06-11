@@ -13,5 +13,6 @@ namespace autofac_mediatR.IoC
       object Resolve(Type t, params Parameter[] parameters);
 
       T ResolveKey<T>(string key);
+      T ResolveNamed<T>(string name);
    }
 }
